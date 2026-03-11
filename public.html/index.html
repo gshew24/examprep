@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ExamPrep</title>
+</head>
+
+<body>
+
+<h1>ExamPrep API</h1>
+
+<button onclick="test()">Check API</button>
+
+<pre id="output"></pre>
+
+<script>
+
+async function test(){
+
+ const res = await fetch("/api/health")
+ const data = await res.json()
+
+ document.getElementById("output").textContent =
+ JSON.stringify(data,null,2)
+
+}
+
+</script>
+
+</body>
+</html>

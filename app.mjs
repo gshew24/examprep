@@ -1,72 +1,103 @@
-import express from "express"
-import dotenv from "dotenv"
-import { MongoClient, ObjectId } from "mongodb"
+import express from 'express';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 
-dotenv.config()
+const app = express();
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const uri = process.env.MONGO_URI;
 
-const app = express()
-const PORT = 3000
+/*
+👇🏻 no mods needed, this starts on 3000 unless (like for render) your PaaS assigns you a port. It's a little cleaner.
+*/ 
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json())
-app.use(express.static("public"))
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
-const client = new MongoClient(process.env.MONGO_URI)
+const yourNameAndEmoji = { name: 'barry', emoji: '🐸' }; //don't use my frog. 
 
-await client.connect()
 
-const db = client.db("examprep")
-const notes = db.collection("notes")
+//app instantiations
+app.use(express.static(join(__dirname, 'public')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/health",(req,res)=>{
- res.json({status:"healthy"})
+
+app.get('/', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'exam.html'));
 })
 
-app.get("/api/notes", async (req,res)=>{
+app.post('/api/get-name', async (req, res) => {
+  try {
+    const { userName } = req.body;
 
- const data = await notes
-   .find({})
-   .sort({timestamp:-1})
-   .toArray()
+    if (!userName) {
+      return res.status(400).json({ error: 'missing name' });
+    }
 
- res.json(data)
+    const db = client.db('cis486');
+    const collection = db.collection('exam');
 
-})
+    const result = await collection.findOne({ name: userName });
 
-app.post("/api/notes", async (req,res)=>{
+    if (!result) {
+      return res.status(404).json({ error: 'Name not found' });
+    }
 
- const result = await notes.insertOne({
-   ...req.body,
-   timestamp: new Date()
- })
-
- res.json({
-   message:"Note saved",
-   id: result.insertedId
- })
-
-})
-
-app.put("/api/notes/:id", async (req,res)=>{
-
- await notes.updateOne(
-   {_id:new ObjectId(req.params.id)},
-   {$set:req.body}
- )
-
- res.json({message:"Updated"})
-
-})
-
-app.delete("/api/notes/:id", async (req,res)=>{
-
- await notes.deleteOne({
-   _id:new ObjectId(req.params.id)
- })
-
- res.json({message:"Deleted"})
+    res.json({ 
+      message: 'Name found', 
+      name: result.name,
+      emoji: result.emoji 
+    });
+  }
+  catch (error) {
+    console.error('Error retrieving name:', error);
+    res.status(500).json({ error: 'Failed to retrieve name' });
+  }
 
 })
 
-app.listen(PORT, ()=>{
- console.log(`Server running on port ${PORT}`)
+/* 
+👇🏻no modifications needed for this endpoint, but you do have to figure out where, when, & how to call it at least once!
+*/
+app.get('/api/init-emoji', async (req, res) => {
+  try {
+    
+    const db = client.db('cis486');
+    const collection = db.collection('exam');
+    
+    // Check if name already exists
+    const existingEntry = await collection.findOne({ name: yourNameAndEmoji.name });
+    
+    if (existingEntry) {
+      return res.json({ 
+        message: 'Name already exists', 
+        data: existingEntry 
+      });
+    }
+    
+    // Only insert if name doesn't exist
+    const result = await collection.insertOne(yourNameAndEmoji);
+    res.json({ message: 'name & emoji recorded', id: result.insertedId });
+  }
+  catch (error) {
+    console.error('Error creating attendance:', error);
+    res.status(500).json({ error: 'Failed to retrieve emoji' });
+  }
+})
+
+/*
+👇🏻notice the refactored app.listen:
+no code mods needed but this uses the PORT variable for PaaS deployments
+*/ 
+//start the server. 
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`)
 })

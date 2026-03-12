@@ -1,19 +1,28 @@
 {
-  "name": "examprep",
+  "name": "full-stack-tech-exam",
   "version": "1.0.0",
-  "description": "DevOps exam prep app",
-  "type": "module",
+  "description": "",
   "main": "app.mjs",
   "scripts": {
-    "start": "node app.mjs",
-    "dev": "nodemon app.mjs"
+    "dev": "nodemon app.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/barrycumbie/full-stack-tech-exam.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/barrycumbie/full-stack-tech-exam/issues"
+  },
+  "homepage": "https://github.com/barrycumbie/full-stack-tech-exam#readme",
   "dependencies": {
-    "dotenv": "^16.6.1",
-    "express": "^4.22.1",
-    "mongodb": "^6.21.0"
-  },
-  "devDependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.1.0",
     "nodemon": "^3.1.14"
   }
 }

@@ -1,30 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>ExamPrep</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Stack Tech Exam</title>
 </head>
 
 <body>
-
-<h1>ExamPrep API</h1>
-
-<button onclick="test()">Check API</button>
-
-<pre id="output"></pre>
-
-<script>
-
-async function test(){
-
- const res = await fetch("/api/health")
- const data = await res.json()
-
- document.getElementById("output").textContent =
- JSON.stringify(data,null,2)
-
-}
-
-</script>
-
+  <h1>Full Stack Tech Exam</h1>
+  
+  <!-- 💁🏼‍♂️ you may need to initialize some data before searching. Check the server endpoints -->
+  
+  <div>
+    <h2>Search for Name</h2>
+    <!-- 
+    this form doesn't let you receive data back and put into the <p id="result">.
+    what do we need to do here with an external <script> 
+    -->
+    <form id="nameForm" method="post" action="api/get-name/">
+      <label for="userName">Enter name:</label>
+      <input id="userName" name="userName" placeholder="Enter a name (e.g., barry)" required>
+      <input type="submit" value="Search"> 
+    </form>
+    <p id="result"></p>
+  </div>
 </body>
+
 </html>

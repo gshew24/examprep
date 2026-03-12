@@ -2,20 +2,14 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
+import { MongoClient, ServerApiVersion } from 'mongodb';
 
 dotenv.config();
 
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uri = process.env.MONGO_URI;
-
 const PORT = process.env.PORT || 3000;
-
-if (!uri) {
-  console.error('Missing MONGO_URI in .env');
-  process.exit(1);
-}
 
 const client = new MongoClient(uri, {
   serverApi: {
